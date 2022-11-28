@@ -9,6 +9,7 @@
       "@Utils/*": ["./src/Utils/*"],
       "@assets/*": ["./src/assets/*"],
       "@theme/*": ["src/theme"],
+      "@Routes/*": ["src/Routes/*"],
     }
   }
 }

@@ -1,7 +1,15 @@
 import React from 'react'
+import { useNavigation } from '@react-navigation/native';
+
 import * as Styled from "./styles";
 
 export default function Statistic() {
+  const navigation = useNavigation();
+
+  function handleNavigation(){
+    navigation.navigate('Home');
+  }
+
   return (
     <Styled.Container>
       <Styled.Title>90,86%</Styled.Title>
@@ -27,7 +35,7 @@ export default function Statistic() {
           </Styled.InfoWrap>
         </Styled.Info>
       </Styled.Statistic>
-      <Styled.BackButtonTouchable activeOpacity={0.5}>
+      <Styled.BackButtonTouchable onPress={handleNavigation} activeOpacity={0.5}>
         <Styled.BackIcon />
       </Styled.BackButtonTouchable>
     </Styled.Container>

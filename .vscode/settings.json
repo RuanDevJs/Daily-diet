@@ -2,7 +2,7 @@
   "files.exclude": {
     "assets": true,
     "node_modules": true,
-    ".gitignore": true,
+    ".gitignore": false,
     "yarn.lock": true,
     "app.json": true,
     ".vscode": true,

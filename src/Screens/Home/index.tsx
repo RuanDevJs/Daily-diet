@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FlatList } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import IconLogo from "@assets/Logo.svg";
 import ProfilePicture from "@assets/Foto.png";
@@ -106,6 +107,8 @@ export default function Home() {
   const [percentFoodsInDiet, setPercentFoodsInDiet] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const navigation = useNavigation();
+
   function handleDiet(){
     const foodsInDiet: foodIndiet[] = [];
 
@@ -124,6 +127,10 @@ export default function Home() {
 
     setPercentFoodsInDiet(parsedFoodInDiet);
     setLoading(false);
+  }
+
+  function handleNavigation(){
+    navigation.navigate('Statistic');
   }
 
   useEffect(() => {
@@ -149,7 +156,7 @@ export default function Home() {
           <Styled.Image source={ProfilePicture} />
         </Styled.TouchableArea>
       </Styled.Header>
-      <Styled.Percent percent={percentFoodsInDiet} activeOpacity={0.68}>
+      <Styled.Percent onPress={handleNavigation} percent={percentFoodsInDiet} activeOpacity={0.68}>
         <Styled.PercentTitle>{percentFoodsInDiet}%</Styled.PercentTitle>
         <Styled.PercentDescription>das refeições dentro da dieta</Styled.PercentDescription>
         <Styled.ArrowIcon />
