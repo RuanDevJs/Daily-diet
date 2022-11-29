@@ -28,11 +28,11 @@ export const Image = styled.Image`
 `;
 
 type PercentProps = TouchableOpacityProps & {
-  percent: number;
+  active?: boolean;
 }
 
 export const Percent = styled.TouchableOpacity<PercentProps>`
-  background-color: ${({ theme, percent }) => percent >= 8 ? theme.COLORS.green_light : theme.COLORS.red_light };
+  background-color: ${({ theme, active }) => active ? theme.COLORS.green_light : theme.COLORS.red_light };
   padding: 32px 0;
   margin-top: ${Device.width * 0.1}px;
 
@@ -58,13 +58,17 @@ export const PercentDescription = styled.Text`
   `}
 `;
 
-export const ArrowIcon = styled(ArrowUpRight).attrs(({ theme }) => ({
+type ArrowIconProps = TouchableOpacityProps & {
+  active?: boolean;
+}
+
+export const ArrowIcon = styled(ArrowUpRight).attrs<ArrowIconProps>(({ theme, active }) => ({
   size: 32,
-  color: theme.COLORS.green_dark
-}))`
+  color: active ? theme.COLORS.green_dark : theme.COLORS.red_dark
+}))<ArrowIconProps>`
   position: absolute;
 
-  left: ${Device.width * 0.83}px;
+  left: ${Device.width * 0.8}px;
   top: ${Device.width * 0.05}px;
 `;
 

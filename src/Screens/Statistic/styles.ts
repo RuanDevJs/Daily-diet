@@ -3,9 +3,17 @@ import { ArrowLeft } from "phosphor-react-native";
 
 import styled, { css } from "styled-components/native";
 
-export const Container = styled.View`
+export const ScrollContainer = styled.ScrollView`
+
+`;
+
+type ContainerProps = {
+  active?: boolean;
+}
+
+export const Container = styled.View<ContainerProps>`
   flex: 1;
-  background-color: ${({ theme }) => theme.COLORS.green_light};
+  background-color: ${({ theme, active }) => active ? theme.COLORS.green_light : theme.COLORS.red_light };
 
   padding-top: ${Device.width * 0.2}px;
   position: relative;
@@ -89,7 +97,7 @@ export const Info = styled.View`
 `;
 
 interface InfoWrapProps {
-  active: boolean;
+  active?: boolean;
 }
 
 export const InfoWrap = styled.View<InfoWrapProps>`
@@ -97,9 +105,12 @@ export const InfoWrap = styled.View<InfoWrapProps>`
 
   padding: 24px;
   margin-top: ${Device.width * 0.05}px;
+  margin-bottom: ${Device.width * 0.05}px;
+
 
   background-color: ${({ theme, active }) => active ? theme.COLORS.green_light : theme.COLORS.red_light};
-  border-radius: 4px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 `;
 
 export const InfoWrapTitle = styled.Text`
@@ -127,9 +138,13 @@ export const BackButtonTouchable = styled.TouchableOpacity`
   left: ${Device.width * 0.05}px;
 `;
 
-export const BackIcon = styled(ArrowLeft).attrs(({ theme }) => ({
+type ArrowLeft = {
+  active?: boolean;
+}
+
+export const BackIcon = styled(ArrowLeft).attrs<ArrowLeft>(({ theme, active }) => ({
   size: 32,
-  color: theme.COLORS.green_dark
-}))`
+  color: active ? theme.COLORS.green_dark : theme.COLORS.red_dark
+}))<ArrowLeft>`
 
 `;

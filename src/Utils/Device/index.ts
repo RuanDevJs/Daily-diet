@@ -13,3 +13,4 @@ export const Device: Device = {
   plataform: Platform.OS,
   behavior: Platform.OS === 'ios' ? 'padding' : 'height'
 };
+

@@ -9,15 +9,17 @@ import Button from "@Components/Button";
 import Meal from "@Components/Meal";
 import Loading from "@Components/Loading";
 
-import * as Styled from "./styles";
+import { formatPercentage } from "@Utils/formatPercentage";
 
+import * as Styled from "./styles";
+interface MealProp {
+  time: string;
+  title: string;
+  isInDiet: boolean;
+}
 interface MealsProps {
   DATE: string;
-  MEALS: {
-    time: string;
-    title: string;
-    isInDiet: boolean;
-  }[];
+  MEALS: MealProp[];
 }
 
 interface foodIndiet {
@@ -104,47 +106,70 @@ const MEALS: MealsProps[] = [
 ]
 
 export default function Home() {
-  const [percentFoodsInDiet, setPercentFoodsInDiet] = useState(0);
+  const [active, setActive] = useState(false);
+  const [formartedPorcentage, setFormartedPorcentage] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const navigation = useNavigation();
 
-  function handleDiet(){
-    const foodsInDiet: foodIndiet[] = [];
+  function handleMeal() {
+    const mealsInDiet: foodIndiet[] = [];
 
     MEALS.forEach((food) => {
       food.MEALS.forEach((food) => {
-        if(food.isInDiet){
-          foodsInDiet.push({
-            name: food.title,
-            isInDiet: food.isInDiet
-          });
-        }
+        mealsInDiet.push({
+          name: food.title,
+          isInDiet: food.isInDiet
+        });
       })
     });
 
-    const parsedFoodInDiet = Math.floor(100 / foodsInDiet.length);
-
-    setPercentFoodsInDiet(parsedFoodInDiet);
-    setLoading(false);
+    return {
+      meals: mealsInDiet,
+      mealsInDiet: mealsInDiet.filter(el => el.isInDiet).length,
+      mealsOutOfnDiet: mealsInDiet.filter(el => !el.isInDiet).length,
+    }
   }
 
-  function handleNavigation(){
-    navigation.navigate('Statistic');
+  function handlePercent(){
+    const handledMeal = handleMeal();
+    const result = formatPercentage(handledMeal.mealsInDiet, handledMeal.meals.length);
+
+    const percentage = handledMeal.mealsInDiet / handledMeal.meals.length;
+
+    if(percentage >= 0.3){
+      setActive(true)
+    }
+
+    setFormartedPorcentage(result);
+    setLoading(false)
+  }
+
+  function handleNavigation() {
+    const handledMeal = handleMeal();
+    const percentage = handledMeal.mealsInDiet / handledMeal.meals.length;
+
+    navigation.navigate('Statistic', {
+      data: {
+        percent: percentage,
+        foodsRegistered: handledMeal.meals.length,
+        foodsInDiet: handledMeal.mealsInDiet,
+        foodOutOfDiet: handledMeal.mealsOutOfnDiet
+      }
+    });
   }
 
   useEffect(() => {
-    handleDiet();
+    handlePercent();
   }, []);
 
-  if(loading){
+  if (loading) {
     return (
       <Loading
         title="Quase lá..."
       />
     );
   }
-
 
   return (
     <Styled.Container>
@@ -156,10 +181,14 @@ export default function Home() {
           <Styled.Image source={ProfilePicture} />
         </Styled.TouchableArea>
       </Styled.Header>
-      <Styled.Percent onPress={handleNavigation} percent={percentFoodsInDiet} activeOpacity={0.68}>
-        <Styled.PercentTitle>{percentFoodsInDiet}%</Styled.PercentTitle>
+      <Styled.Percent
+        onPress={handleNavigation}
+        activeOpacity={0.68}
+        active={active}
+      >
+        <Styled.PercentTitle>{formartedPorcentage}%</Styled.PercentTitle>
         <Styled.PercentDescription>das refeições dentro da dieta</Styled.PercentDescription>
-        <Styled.ArrowIcon />
+        <Styled.ArrowIcon active={active} />
       </Styled.Percent>
       <Styled.Meals>
         <Styled.MealsTitle>Refeições</Styled.MealsTitle>
