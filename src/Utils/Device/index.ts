@@ -4,7 +4,7 @@ type Device = {
   width: number;
   height: number;
   plataform: string;
-  behavior: string;
+  behavior: 'padding' | 'height';
 }
 
 export const Device: Device = {

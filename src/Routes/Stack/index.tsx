@@ -2,6 +2,7 @@ import  { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Home from "@Screens/Home";
 import Statistic from "@Screens/Statistic";
+import Form from "@Screens/Form";
 
 export default function Stack() {
   const { Navigator, Screen } = createNativeStackNavigator();
@@ -19,6 +20,10 @@ export default function Stack() {
        <Screen
         component={Statistic}
         name="Statistic"
+      />
+      <Screen
+        component={Form}
+        name="Form"
       />
     </Navigator>
   )

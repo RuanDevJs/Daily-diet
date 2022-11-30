@@ -159,6 +159,10 @@ export default function Home() {
     });
   }
 
+  function navigateForm() {
+    navigation.navigate('Form')
+  }
+
   useEffect(() => {
     handlePercent();
   }, []);
@@ -192,7 +196,10 @@ export default function Home() {
       </Styled.Percent>
       <Styled.Meals>
         <Styled.MealsTitle>Refeições</Styled.MealsTitle>
-        <Button title="+ Nova refeição" />
+        <Button
+          title="+ Nova refeição"
+          onPress={navigateForm}
+        />
         <FlatList
           data={MEALS}
           keyExtractor={((_, index) => `$key=${index}`)}
