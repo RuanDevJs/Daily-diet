@@ -16,9 +16,9 @@ export default function Meal({ data }: MealsProps) {
     <Styled.Container>
       <Styled.Title>{data.DATE}</Styled.Title>
       {
-        data.MEALS.map((meal) => {
+        data.MEALS.map((meal, index) => {
           return(
-            <Styled.Wrap key={meal.title}>
+            <Styled.Wrap key={`${meal.title}-${index}`}>
               <Styled.WrapTime>{meal.time}</Styled.WrapTime>
               <Styled.Separator />
               <Styled.WrapTitle numberOfLines={1}>{meal.title}</Styled.WrapTitle>

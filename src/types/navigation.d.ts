@@ -11,6 +11,9 @@ export declare global {
         };
       };
       Form: undefined;
+      Feedback: {
+        type: 'positive' | 'negative'
+      };
     }
   }
 }

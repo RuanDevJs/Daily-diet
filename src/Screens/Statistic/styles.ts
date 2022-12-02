@@ -41,8 +41,10 @@ export const Description = styled.Text`
 
 export const Statistic = styled.View`
   flex: 1;
-  margin-top: ${Device.width * 0.1}px;
-  padding-top: ${Device.width * 0.12}px;
+  height: ${Device.height}px;
+
+  margin-top: ${Device.width * 0.04}px;
+  padding-top: ${Device.width * 0.1}px;
 
   background-color: ${({ theme }) => theme.COLORS.white};
   border-radius: 20px;

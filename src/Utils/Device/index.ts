@@ -3,7 +3,7 @@ import { Dimensions, Platform } from "react-native";
 type Device = {
   width: number;
   height: number;
-  plataform: string;
+  plataform: 'android' | 'ios' | 'windows' | 'macos' | 'web';
   behavior: 'padding' | 'height';
 }
 

@@ -13,7 +13,8 @@ module.exports = function(api) {
             "@Utils": './src/Utils',
             "@assets": './src/assets',
             "@theme": './src/theme',
-            "@Routes": './src/Routes'
+            "@Routes": './src/Routes',
+            "@Storage": './src/storage',
           }
         }
       ]

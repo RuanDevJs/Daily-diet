@@ -1,6 +1,4 @@
-type formatPercentage = (value: number, total: number) => string;
-
-export function formatPercentage(value: number, total: number): number {
+export function formatPercentage(value: number, total: number): string {
   const percentage = (value / total) * 100;
-  return percentage;
+  return percentage.toFixed(2);
 }

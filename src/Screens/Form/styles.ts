@@ -37,7 +37,7 @@ export const Form = styled.View`
 
 export const FormWrap = styled.TouchableOpacity`
   width: 90%;
-  margin-top: ${Device.width * 0.1}px;
+  margin-top: ${Device.width * 0.04}px;
 `;
 
 export const Label = styled.Text`
@@ -72,12 +72,21 @@ export const FormRow = styled.View`
   flex-direction: row;
   justify-content: space-around;
 `;
+interface FormSelectProps {
+  type: "inDiet" | "notInDiet";
+  active: boolean;
+}
 
-export const FormSelect = styled.TouchableOpacity`
-  ${({ theme }) =>
-    css`
+export const FormSelect = styled.TouchableOpacity<FormSelectProps>`
+  ${({ theme, type, active }) => {
+    const returnBackground = type === 'inDiet' ? theme.COLORS.green_light : theme.COLORS.red_light;
+    const returnBorder = type === 'inDiet' ? theme.COLORS.green_dark : theme.COLORS.red_dark;
+
+    return css`
+      flex-direction: row;
+
       width: 43%;
-      border: 1.5px solid ${theme.COLORS.gray_500};
+      background-color: ${theme.COLORS.gray_700};
       border-radius: 4px;
 
       font-family: ${theme.FONT.regular};
@@ -88,7 +97,10 @@ export const FormSelect = styled.TouchableOpacity`
 
       justify-content: center;
       align-items: center;
-    `}
+      ${active && `background-color: ${returnBackground};`}
+      ${active && `border: 1.5px solid ${returnBorder};`}
+    `;
+  }}
 `;
 
 export const FormSelectLabel = styled.Text`
@@ -97,5 +109,22 @@ export const FormSelectLabel = styled.Text`
       font-family: ${theme.FONT.bold};
       font-size: ${theme.FONT_SIZE.md}px;
       color: ${theme.COLORS.gray_200};
+    `}
+`;
+
+interface FormSelectIconProps {
+  active?: boolean;
+}
+
+export const FormSelectIcon = styled.View<FormSelectIconProps>`
+  ${({ theme, active }) =>
+    css`
+      width: 10px;
+      height: 10px;
+
+      background-color: ${active ? theme.COLORS.green_dark : theme.COLORS.red_dark};
+
+      border-radius: 20px;
+      margin-right: 8px;
     `}
 `;

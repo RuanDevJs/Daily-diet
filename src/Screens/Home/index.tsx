@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 import IconLogo from "@assets/Logo.svg";
 import ProfilePicture from "@assets/Foto.png";
@@ -10,6 +10,7 @@ import Meal from "@Components/Meal";
 import Loading from "@Components/Loading";
 
 import { formatPercentage } from "@Utils/formatPercentage";
+import { find } from "@Storage/Meals";
 
 import * as Styled from "./styles";
 interface MealProp {
@@ -22,9 +23,15 @@ interface MealsProps {
   MEALS: MealProp[];
 }
 
-interface foodIndiet {
+interface parsedMeal {
   name: string;
   isInDiet: boolean;
+}
+
+interface getAndParseAllMeals {
+  meals: parsedMeal[];
+  mealsInDiet: number;
+  mealsOutOfnDiet: number;
 }
 
 const MEALS: MealsProps[] = [
@@ -107,17 +114,21 @@ const MEALS: MealsProps[] = [
 
 export default function Home() {
   const [active, setActive] = useState(false);
-  const [formartedPorcentage, setFormartedPorcentage] = useState(0);
+  const [formartedPorcentage, setFormartedPorcentage] = useState<string>('');
+
   const [loading, setLoading] = useState(true);
+  const [meals, setMeals] = useState<MealsProps[]>([]);
+
+  const [mealsData, setMealsData] = useState<getAndParseAllMeals>({} as getAndParseAllMeals);
 
   const navigation = useNavigation();
 
-  function handleMeal() {
-    const mealsInDiet: foodIndiet[] = [];
+  function getAndParseAllMeals(meals: MealsProps[]): getAndParseAllMeals {
+    const parsedMeal:parsedMeal[] = [];
 
-    MEALS.forEach((food) => {
+    meals.forEach((food) => {
       food.MEALS.forEach((food) => {
-        mealsInDiet.push({
+        parsedMeal.push({
           name: food.title,
           isInDiet: food.isInDiet
         });
@@ -125,36 +136,47 @@ export default function Home() {
     });
 
     return {
-      meals: mealsInDiet,
-      mealsInDiet: mealsInDiet.filter(el => el.isInDiet).length,
-      mealsOutOfnDiet: mealsInDiet.filter(el => !el.isInDiet).length,
-    }
+      meals: parsedMeal,
+      mealsInDiet: parsedMeal.filter(el => el.isInDiet).length,
+      mealsOutOfnDiet: parsedMeal.filter(el => !el.isInDiet).length
+    };
   }
 
-  function handlePercent(){
-    const handledMeal = handleMeal();
-    const result = formatPercentage(handledMeal.mealsInDiet, handledMeal.meals.length);
+  async function handleMeal() {
+    try {
+      const mealStorage = await find();
+      const getMeal = getAndParseAllMeals(mealStorage);
 
-    const percentage = handledMeal.mealsInDiet / handledMeal.meals.length;
+      if(mealStorage && mealStorage.length){
+        const parsedPorcentage = formatPercentage(getMeal.mealsOutOfnDiet, getMeal.meals.length);
 
-    if(percentage >= 0.3){
-      setActive(true)
+        const realPorcentage = getMeal.mealsInDiet / getMeal.meals.length;
+
+        if(realPorcentage >= 0.3){
+          setActive(true);
+        }
+
+        setMeals(mealStorage);
+        setFormartedPorcentage(parsedPorcentage);
+        setMealsData(getMeal);
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false);
     }
 
-    setFormartedPorcentage(result);
-    setLoading(false)
   }
 
   function handleNavigation() {
-    const handledMeal = handleMeal();
-    const percentage = handledMeal.mealsInDiet / handledMeal.meals.length;
+    const percentage = mealsData.mealsInDiet / mealsData.meals.length;
 
     navigation.navigate('Statistic', {
       data: {
         percent: percentage,
-        foodsRegistered: handledMeal.meals.length,
-        foodsInDiet: handledMeal.mealsInDiet,
-        foodOutOfDiet: handledMeal.mealsOutOfnDiet
+        foodsRegistered: mealsData.meals.length,
+        foodsInDiet: mealsData.mealsInDiet,
+        foodOutOfDiet: mealsData.mealsOutOfnDiet
       }
     });
   }
@@ -163,9 +185,11 @@ export default function Home() {
     navigation.navigate('Form')
   }
 
-  useEffect(() => {
-    handlePercent();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      handleMeal();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -201,8 +225,8 @@ export default function Home() {
           onPress={navigateForm}
         />
         <FlatList
-          data={MEALS}
-          keyExtractor={((_, index) => `$key=${index}`)}
+          data={meals}
+          keyExtractor={((item, index) => `$key=${index}`)}
           renderItem={({ item }) => <Meal data={item} />}
           showsVerticalScrollIndicator={false}
         />
