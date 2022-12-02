@@ -1,4 +1,6 @@
 import styled, { css } from "styled-components/native";
+import { ArrowLeft } from "phosphor-react-native";
+
 import { Device } from "@Utils/Device";
 
 export const TouchableWithoutFeedback = styled.TouchableWithoutFeedback`
@@ -128,3 +130,14 @@ export const FormSelectIcon = styled.View<FormSelectIconProps>`
       margin-right: 8px;
     `}
 `;
+
+export const BackButtonTouchable = styled.TouchableOpacity`
+  position: absolute;
+  top: ${Device.width * 0.2}px;
+  left: ${Device.width * 0.05}px;
+`;
+
+export const BackIcon = styled(ArrowLeft).attrs(({ theme }) => ({
+  size: 32,
+  color: theme.COLORS.gray_100
+}))``;

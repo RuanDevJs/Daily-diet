@@ -4,7 +4,7 @@ export declare global {
       Home: undefined;
       Statistic: {
         data: {
-          percent: number;
+          percent: string;
           foodsRegistered: number;
           foodsInDiet: number;
           foodOutOfDiet: number;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FlatList } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker"
 
 import IconLogo from "@assets/Logo.svg";
 import ProfilePicture from "@assets/Foto.png";
@@ -11,6 +12,7 @@ import Loading from "@Components/Loading";
 
 import { formatPercentage } from "@Utils/formatPercentage";
 import { find } from "@Storage/Meals";
+import * as StorageUser from "@Storage/User";
 
 import * as Styled from "./styles";
 interface MealProp {
@@ -112,6 +114,13 @@ const MEALS: MealsProps[] = [
   }
 ]
 
+interface ImagePickerProps {
+  cancelled: boolean;
+  height: number;
+  width: number;
+  uri: string;
+}
+
 export default function Home() {
   const [active, setActive] = useState(false);
   const [formartedPorcentage, setFormartedPorcentage] = useState<string>('');
@@ -119,12 +128,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [meals, setMeals] = useState<MealsProps[]>([]);
 
+  const [imageUri, setImageUri] = useState<string>('');
   const [mealsData, setMealsData] = useState<getAndParseAllMeals>({} as getAndParseAllMeals);
 
   const navigation = useNavigation();
 
   function getAndParseAllMeals(meals: MealsProps[]): getAndParseAllMeals {
-    const parsedMeal:parsedMeal[] = [];
+    const parsedMeal: parsedMeal[] = [];
 
     meals.forEach((food) => {
       food.MEALS.forEach((food) => {
@@ -147,12 +157,12 @@ export default function Home() {
       const mealStorage = await find();
       const getMeal = getAndParseAllMeals(mealStorage);
 
-      if(mealStorage && mealStorage.length){
-        const parsedPorcentage = formatPercentage(getMeal.mealsOutOfnDiet, getMeal.meals.length);
+      if (mealStorage && mealStorage.length) {
+        const parsedPorcentage = formatPercentage(getMeal.mealsInDiet, getMeal.meals.length);
 
         const realPorcentage = getMeal.mealsInDiet / getMeal.meals.length;
 
-        if(realPorcentage >= 0.3){
+        if (realPorcentage >= 0.3) {
           setActive(true);
         }
 
@@ -169,11 +179,10 @@ export default function Home() {
   }
 
   function handleNavigation() {
-    const percentage = mealsData.mealsInDiet / mealsData.meals.length;
 
     navigation.navigate('Statistic', {
       data: {
-        percent: percentage,
+        percent: formartedPorcentage,
         foodsRegistered: mealsData.meals.length,
         foodsInDiet: mealsData.mealsInDiet,
         foodOutOfDiet: mealsData.mealsOutOfnDiet
@@ -185,9 +194,37 @@ export default function Home() {
     navigation.navigate('Form')
   }
 
+  const pickImage = useCallback(() => {
+    (async () => {
+      try {
+        const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 4],
+          quality: 1
+        });
+
+        if(result && result.assets){
+          await StorageUser.store(result.assets[0].uri);
+          setImageUri(result.assets[0].uri);
+        }
+      } catch {
+        alert('Não foi possível alterar a foto...')
+      }
+    })()
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      handleMeal();
+      (async() => {
+        const uri = await StorageUser.find();
+
+        if(uri && uri.length){
+          setImageUri(uri);
+        }
+
+        await handleMeal();
+      })();
     }, [])
   );
 
@@ -205,8 +242,8 @@ export default function Home() {
         <Styled.TouchableArea activeOpacity={0.8}>
           <IconLogo />
         </Styled.TouchableArea>
-        <Styled.TouchableArea activeOpacity={0.72}>
-          <Styled.Image source={ProfilePicture} />
+        <Styled.TouchableArea activeOpacity={0.72} onPress={pickImage}>
+          { imageUri ? <Styled.Image source={{ uri: imageUri }} /> : <Styled.MealsTitle>Adicionar Foto</Styled.MealsTitle>}
         </Styled.TouchableArea>
       </Styled.Header>
       <Styled.Percent

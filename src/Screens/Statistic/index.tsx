@@ -23,7 +23,7 @@ export default function Statistic() {
 
   return (
     <Styled.Container active={data.percent > 0.3}>
-      <Styled.Title>{formatedPercentage.toFixed()}%</Styled.Title>
+      <Styled.Title>{data.percent}%</Styled.Title>
       <Styled.Description>das refeições dentro da dieta</Styled.Description>
       <Styled.Statistic>
         <Styled.StatisticTitle>Estatísticas gerais</Styled.StatisticTitle>

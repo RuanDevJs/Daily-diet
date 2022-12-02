@@ -160,6 +160,9 @@ export default function Form() {
             onPress={handleSubmit}
           />
         </Styled.Form>
+        <Styled.BackButtonTouchable onPress={() => navigation.navigate('Home')}>
+          <Styled.BackIcon />
+        </Styled.BackButtonTouchable>
       </Styled.Container>
     </Styled.TouchableWithoutFeedback>
   )
