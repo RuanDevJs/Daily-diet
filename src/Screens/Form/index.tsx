@@ -82,7 +82,7 @@ export default function Form() {
         MEALS: [
           {
             title: formText.name,
-            descrption: formText.description,
+            description: formText.description,
             time: formDate.time,
             isInDiet: activeYesButon ? true : false
           }

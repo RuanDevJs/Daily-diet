@@ -12,9 +12,17 @@ export declare global {
       };
       Form: undefined;
       Feedback: {
-        type: 'positive' | 'negative'
+        type: "positive" | "negative";
+      };
+      Meal: {
+        DATE: string;
+        MEAL: {
+          time: string;
+          title: string;
+          description: string;
+          isInDiet: boolean;
+        };
       };
     }
   }
 }
-

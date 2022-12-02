@@ -6,6 +6,7 @@ import Button from "@Components/Button";
 import IlustrationPositive from "@assets/IlustrationPositive.svg";
 import IlustrationNegative from "@assets/IlustrationNegative.svg";
 
+import { Device } from "@Utils/Device";
 import * as Styled from "./styled";
 
 interface ModalProps {
@@ -47,13 +48,12 @@ export default function Modal({ type = 'positive', onPress }: ModalProps) {
             <IlustrationNegative />
           }
         </Styled.Wrap>
-        <Styled.Wrap activeOpacity={100}>
           <Button
             title="Ir para a página inicial"
             activeOpacity={0.72}
             onPress={onPress}
+            style={{ marginTop: Device.width * 0.1 }}
           />
-        </Styled.Wrap>
       </Styled.Container>
     </Styled.Modal>
   )

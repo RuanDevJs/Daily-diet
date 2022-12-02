@@ -13,7 +13,7 @@ export const Title = styled.Text`
   `}
 `;
 
-export const Wrap = styled.View`
+export const Wrap = styled.TouchableOpacity`
   border: 1px solid ${({ theme }) => theme.COLORS.gray_500};
   border-radius: 4px;
   padding: 18px;

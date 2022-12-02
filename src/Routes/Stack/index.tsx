@@ -4,6 +4,7 @@ import Home from "@Screens/Home";
 import Statistic from "@Screens/Statistic";
 import Form from "@Screens/Form";
 import Feedback from "@Screens/Feedback";
+import Meal from "@Screens/Meal";
 
 export default function Stack() {
   const { Navigator, Screen } = createNativeStackNavigator();
@@ -29,6 +30,10 @@ export default function Stack() {
       <Screen
         component={Feedback}
         name="Feedback"
+      />
+      <Screen
+        component={Meal}
+        name="Meal"
       />
     </Navigator>
   )
