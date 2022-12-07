@@ -11,11 +11,15 @@ import * as Styled from "./styled";
 
 interface ModalProps {
   type: 'positive' | 'negative';
-  onPress: () => void;
 }
 
-export default function Modal({ type = 'positive', onPress }: ModalProps) {
+export default function Modal({ type = 'positive' }: ModalProps) {
   const theme = useTheme();
+  const navigation = useNavigation();
+
+  function handleNavigation(){
+    navigation.navigate('Home');
+  }
 
   const UI = {
     title: type === 'positive' ? 'Continue assim!' : 'Que pena!',
@@ -51,7 +55,7 @@ export default function Modal({ type = 'positive', onPress }: ModalProps) {
           <Button
             title="Ir para a página inicial"
             activeOpacity={0.72}
-            onPress={onPress}
+            onPress={handleNavigation}
             style={{ marginTop: Device.width * 0.1 }}
           />
       </Styled.Container>

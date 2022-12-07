@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { store } from '@Storage/Meals';
 import { Device } from '@Utils/Device';
+import { AppError } from '@Utils/Errors';
 import { format } from 'date-fns';
 
 import * as Styled from "./styles";
@@ -30,7 +31,7 @@ interface FormProps {
 interface MealProp {
   time: string;
   title: string;
-  descrption: string;
+  description: string;
   isInDiet: boolean;
 }
 interface MealsProps {
@@ -65,11 +66,11 @@ export default function Form() {
 
   function valdiateForm() {
     if (formText.name.length === 0 || formText.description.length === 0) {
-      return Alert.alert(title, 'Complete o formulário, não esqueça do nome e descrição! 😣')
-    } else if (!formDate.date && !formDate.time) {
-      return Alert.alert(title, 'Complete o formulário, não esqueça dos horários! 😣')
+      throw new AppError('Complete o formulário, não esqueça do nome e descrição! 😣');
+    } else if (formDate.date.length === 0 || formDate.time.length === 0) {
+      throw new AppError('Complete o formulário, não esqueça dos horários! 😣');
     } else if (!activeNoButon && !activeYesButon) {
-      return Alert.alert(title, 'Está ou não na dieta ? 👀')
+      throw new AppError('Está ou não na dieta ? 👀');
     }
   }
 
@@ -94,7 +95,9 @@ export default function Form() {
         type: activeYesButon ? 'positive' : 'negative'
       });
     } catch (error) {
-      Alert.alert(title, 'Não foi possível adicionar a refeição 😭');
+      if(error instanceof AppError){
+        Alert.alert(title, error.message);
+      }
     }
   }
 
@@ -262,14 +265,14 @@ function FormIos({ formDate, setFormDate }: FormProps) {
   function handleDate(event: Event, datePicked: Date | undefined) {
     if (datePicked !== undefined) {
       const parsedDate = format(datePicked, 'd.MM.y');
-      setDate(datePicked);
+      setFormDate(oldValue => ({ ...oldValue, date: parsedDate }));
     }
   }
 
   function handleTime(event: Event, datePicked: Date | undefined) {
     if (datePicked !== undefined) {
       const formatedTime = `${datePicked.getHours()}:${datePicked.getMinutes()}`;
-      setTime(datePicked);
+      setFormDate(oldValue => ({ ...oldValue, time: formatedTime }));
     }
   }
 

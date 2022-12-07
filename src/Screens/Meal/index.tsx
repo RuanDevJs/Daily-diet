@@ -6,6 +6,7 @@ import { useTheme } from 'styled-components/native';
 
 import CustomButton from '@Components/CustomButton';
 
+import { deleteMeal } from '@Storage/Meals';
 import * as Styled from "./styled";
 
 interface useRouteProps {
@@ -29,8 +30,17 @@ export default function Meal() {
     color: meal.MEAL.isInDiet ? theme.COLORS.green_dark : theme.COLORS.red_dark,
   }
 
-  function goBack(){
+  function goBack() {
     navigation.navigate('Home');
+  }
+
+  async function onDelete(){
+    try {
+      await deleteMeal(meal);
+      goBack();
+    } catch(error){
+      console.log(error);
+    }
   }
 
   return (
@@ -49,23 +59,38 @@ export default function Meal() {
           <Styled.ContentStatus activeOpacity={0.72}>
             <Styled.StatusCircle style={{ backgroundColor: colors.color }} />
             <Styled.ContentDescription>
-              { meal.MEAL.isInDiet ? 'dentro da dieta' : 'fora da dieta' }
+              {meal.MEAL.isInDiet ? 'dentro da dieta' : 'fora da dieta'}
             </Styled.ContentDescription>
           </Styled.ContentStatus>
         </Styled.Wrap>
 
-        <CustomButton style={{ width: '80%', marginTop: Device.width * 0.55 }}>
-          <Styled.EditIcon />
-          <Styled.ButtonTitle>Editar refeição</Styled.ButtonTitle>
-        </CustomButton>
-        <CustomButton
+        <Styled.Wrap
           style={{
-            width: '80%', backgroundColor: theme.COLORS.white,
-            borderWidth: 1.5,
-          }}>
-          <Styled.DeleteIcon />
-          <Styled.ButtonTitle style={{ color: theme.COLORS.gray_100 }}>Excluir refeição</Styled.ButtonTitle>
-        </CustomButton>
+            width: '100%',
+            height: Device.width * 0.7,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <CustomButton style={{ width: '80%' }}>
+            <Styled.EditIcon />
+            <Styled.ButtonTitle>Editar refeição</Styled.ButtonTitle>
+          </CustomButton>
+          <CustomButton
+            style={{
+              width: '80%', backgroundColor: theme.COLORS.white,
+              borderWidth: 1.5,
+            }}
+            onPress={onDelete}
+          >
+            <Styled.DeleteIcon />
+            <Styled.ButtonTitle
+              style={{ color: theme.COLORS.gray_100 }}
+            >
+              Excluir refeição
+            </Styled.ButtonTitle>
+          </CustomButton>
+        </Styled.Wrap>
       </Styled.Content>
       <Styled.BackButton onPress={goBack}>
         <Styled.BackButtonIcon />

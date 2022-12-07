@@ -69,6 +69,7 @@ export default function Home() {
 
   async function handleMeal() {
     try {
+      setLoading(true)
       const mealStorage = await find();
       const getMeal = getAndParseAllMeals(mealStorage);
 
@@ -84,25 +85,29 @@ export default function Home() {
         setMeals(mealStorage);
         setFormartedPorcentage(parsedPorcentage);
         setMealsData(getMeal);
+      }else{
+        setMeals([]);
+        setFormartedPorcentage('0');
+        setActive(false);
       }
     } catch (e) {
       console.log(e)
     } finally {
       setLoading(false);
     }
-
   }
 
   function handleNavigation() {
-
-    navigation.navigate('Statistic', {
-      data: {
-        percent: formartedPorcentage,
-        foodsRegistered: mealsData.meals.length,
-        foodsInDiet: mealsData.mealsInDiet,
-        foodOutOfDiet: mealsData.mealsOutOfnDiet
-      }
-    });
+    if(meals && meals.length){
+      navigation.navigate('Statistic', {
+        data: {
+          percent: formartedPorcentage,
+          foodsRegistered: mealsData.meals.length,
+          foodsInDiet: mealsData.mealsInDiet,
+          foodOutOfDiet: mealsData.mealsOutOfnDiet
+        }
+      });
+    }
   }
 
   function navigateForm() {
