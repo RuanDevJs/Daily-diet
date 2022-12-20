@@ -16,11 +16,14 @@ import * as StorageUser from "@Storage/User";
 
 import * as Styled from "./styles";
 interface MealProp {
+  _id: string | number[];
   time: string;
+  description: string;
   title: string;
   isInDiet: boolean;
 }
 interface MealsProps {
+  _id: string | number[];
   DATE: string;
   MEALS: MealProp[];
 }
@@ -38,7 +41,7 @@ interface getAndParseAllMeals {
 
 export default function Home() {
   const [active, setActive] = useState(false);
-  const [formartedPorcentage, setFormartedPorcentage] = useState<string>('');
+  const [formartedPorcentage, setFormartedPorcentage] = useState<string>('0');
 
   const [loading, setLoading] = useState(true);
   const [meals, setMeals] = useState<MealsProps[]>([]);
@@ -80,18 +83,24 @@ export default function Home() {
 
         if (realPorcentage >= 0.3) {
           setActive(true);
+          setMeals(mealStorage);
+          setFormartedPorcentage(parsedPorcentage);
+          setMealsData(getMeal);
+        }else {
+          setActive(false);
+          setMeals(mealStorage);
+          setFormartedPorcentage(parsedPorcentage);
+          setMealsData(getMeal);
         }
 
-        setMeals(mealStorage);
-        setFormartedPorcentage(parsedPorcentage);
-        setMealsData(getMeal);
       }else{
         setMeals([]);
         setFormartedPorcentage('0');
         setActive(false);
       }
     } catch (e) {
-      console.log(e)
+      setMeals([]);
+      setFormartedPorcentage('0');
     } finally {
       setLoading(false);
     }
@@ -111,7 +120,9 @@ export default function Home() {
   }
 
   function navigateForm() {
-    navigation.navigate('Form')
+    navigation.navigate('Form', {
+      type: 'store'
+    })
   }
 
   const pickImage = useCallback(() => {
@@ -137,13 +148,13 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       (async() => {
+        await handleMeal();
+
         const uri = await StorageUser.find();
 
         if(uri && uri.length){
           setImageUri(uri);
         }
-
-        await handleMeal();
       })();
     }, [])
   );

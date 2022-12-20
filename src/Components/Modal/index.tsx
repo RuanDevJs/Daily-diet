@@ -1,5 +1,5 @@
 import { useTheme } from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 
 import Button from "@Components/Button";
 
@@ -18,7 +18,7 @@ export default function Modal({ type = 'positive' }: ModalProps) {
   const navigation = useNavigation();
 
   function handleNavigation(){
-    navigation.navigate('Home');
+    navigation.dispatch(StackActions.popToTop());
   }
 
   const UI = {

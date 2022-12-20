@@ -10,7 +10,18 @@ export declare global {
           foodOutOfDiet: number;
         };
       };
-      Form: undefined;
+      Form: {
+        type: "store" | "update";
+        MEAL?: {
+          DATE: string;
+          MEAL: {
+            time: string;
+            title: string;
+            description: string;
+            isInDiet: boolean;
+          };
+        };
+      };
       Feedback: {
         type: "positive" | "negative";
       };

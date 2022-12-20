@@ -1,17 +1,19 @@
 import React from 'react'
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { StackActions, useNavigation, useRoute } from '@react-navigation/native';
 
 import { Device } from '@Utils/Device';
 import { useTheme } from 'styled-components/native';
 
 import CustomButton from '@Components/CustomButton';
 
-import { deleteMeal } from '@Storage/Meals';
+import { remove } from '@Storage/Meals';
 import * as Styled from "./styled";
 
 interface useRouteProps {
+  _id: string | number[];
   DATE: string;
   MEAL: {
+    _id: string | number[];
     time: string;
     title: string;
     description: string;
@@ -31,16 +33,24 @@ export default function Meal() {
   }
 
   function goBack() {
-    navigation.navigate('Home');
+    navigation.dispatch(StackActions.popToTop());
   }
 
   async function onDelete(){
     try {
-      await deleteMeal(meal);
+      await remove({ mealId: meal._id, idToDelete: meal.MEAL._id});
       goBack();
     } catch(error){
+      goBack();
       console.log(error);
     }
+  }
+
+  function onUpdate(){
+    navigation.navigate('Form', {
+      type: 'update',
+      MEAL: meal
+    })
   }
 
   return (
@@ -72,7 +82,7 @@ export default function Meal() {
             alignItems: 'center'
           }}
         >
-          <CustomButton style={{ width: '80%' }}>
+          <CustomButton style={{ width: '80%' }} onPress={onUpdate}>
             <Styled.EditIcon />
             <Styled.ButtonTitle>Editar refeição</Styled.ButtonTitle>
           </CustomButton>

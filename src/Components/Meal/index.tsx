@@ -1,44 +1,31 @@
 import { useNavigation } from "@react-navigation/native";
 import * as Styled from "./styles";
 
-interface MealsProps {
-  data: {
-    DATE: string;
-    MEALS: {
-      time: string;
-      title: string;
-      description: string;
-      isInDiet: boolean;
-    }[]
-  }
-}
-
-interface Meal {
-  DATE: string;
-  MEAL: {
-    time: string;
-    title: string;
-    description: string;
-    isInDiet: boolean;
-  }
-}
-
 interface Data {
+  _id: string | number[];
   time: string;
   title: string;
   description: string;
   isInDiet: boolean;
 }
+interface MealComponentProps {
+  data: {
+    _id: string | number[];
+    DATE: string;
+    MEALS: Data[];
+  }
+}
 
-export default function Meal({ data }: MealsProps) {
+
+export default function Meal({ data }: MealComponentProps) {
   const navigation = useNavigation();
 
   function goToMealPage(mealData: Data) {
-    const meal: Meal = {
+    const meal = {
+      _id: data._id,
       DATE: data.DATE,
       MEAL: mealData
     }
-
     navigation.navigate("Meal", meal);
   }
 

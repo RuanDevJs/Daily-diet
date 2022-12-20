@@ -1,12 +1,13 @@
 import React, { Dispatch, SetStateAction, useState } from 'react'
 import { Alert, Keyboard, Modal } from 'react-native';
+import uuid from "react-native-uuid";
 
 import Button from '@Components/Button';
 
 import DatePicker, { Event } from '@react-native-community/datetimepicker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-import { store } from '@Storage/Meals';
+import { remove, store, update } from '@Storage/Meals';
 import { Device } from '@Utils/Device';
 import { AppError } from '@Utils/Errors';
 import { format } from 'date-fns';
@@ -29,23 +30,49 @@ interface FormProps {
 }
 
 interface MealProp {
+  _id: string | number[];
   time: string;
   title: string;
   description: string;
   isInDiet: boolean;
 }
 interface MealsProps {
+  _id: string | number[];
   DATE: string;
   MEALS: MealProp[];
 }
 
+interface useRouteProps {
+  type: "store" | "update";
+  MEAL?: {
+    _id: string | number[];
+    DATE: string;
+    MEAL: {
+      _id: string | number[];
+      time: string;
+      title: string;
+      description: string;
+      isInDiet: boolean;
+    };
+  };
+}
+
 export default function Form() {
+  const { type, MEAL } = useRoute().params as useRouteProps;
+
+  const FORM_UI = {
+    TITLE: type === 'store' ? 'Nova refeição' : 'Editar refeição',
+    BUTTON_TITLE: type === 'store' ? 'Cadastrar refeição' : 'Editar refeição',
+  }
   const plataform = Device.plataform;
 
-  const [formDate, setFormDate] = useState<FormDateProps>({} as FormDateProps);
+  const [formDate, setFormDate] = useState<FormDateProps>({
+    date: MEAL?.DATE || '',
+    time: MEAL?.MEAL.time || ''
+  } as FormDateProps);
   const [formText, setFormText] = useState<FormTextProps>({
-    name: '',
-    description: ''
+    name: MEAL?.MEAL.title || '',
+    description: MEAL?.MEAL.description || ''
   } as FormTextProps);
 
   const [activeYesButon, setActiveYesButon] = useState(false);
@@ -68,20 +95,22 @@ export default function Form() {
     if (formText.name.length === 0 || formText.description.length === 0) {
       throw new AppError('Complete o formulário, não esqueça do nome e descrição! 😣');
     } else if (formDate.date.length === 0 || formDate.time.length === 0) {
+      console.log(formDate)
       throw new AppError('Complete o formulário, não esqueça dos horários! 😣');
     } else if (!activeNoButon && !activeYesButon) {
       throw new AppError('Está ou não na dieta ? 👀');
     }
   }
 
-  async function handleSubmit() {
+  async function handleStore() {
     try {
       valdiateForm();
-
       const newMeal: MealsProps = {
+        _id: uuid.v4(),
         DATE: formDate.date,
         MEALS: [
           {
+            _id: uuid.v4(),
             title: formText.name,
             description: formText.description,
             time: formDate.time,
@@ -89,14 +118,45 @@ export default function Form() {
           }
         ]
       }
-
       await store(newMeal);
       navigation.navigate('Feedback', {
         type: activeYesButon ? 'positive' : 'negative'
       });
     } catch (error) {
-      if(error instanceof AppError){
+      if (error instanceof AppError) {
         Alert.alert(title, error.message);
+      } else {
+        console.log(error)
+      }
+    }
+  }
+
+  async function handleUpdate() {
+    try {
+      valdiateForm();
+      if (MEAL) {
+        const newMeal = {
+          _id: MEAL._id,
+          DATE: formDate.date,
+          MEALS: [{
+            _id: MEAL.MEAL._id,
+            title: formText.name,
+            description: formText.description,
+            time: formDate.time,
+            isInDiet: activeYesButon ? true : false
+          }]
+        }
+
+        await update(newMeal);
+        navigation.navigate('Feedback', {
+          type: activeYesButon ? 'positive' : 'negative'
+        });
+      }
+    } catch (error) {
+      if (error instanceof AppError) {
+        Alert.alert(title, error.message);
+      } else {
+        console.log(error)
       }
     }
   }
@@ -104,13 +164,14 @@ export default function Form() {
   return (
     <Styled.TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Styled.Container>
-        <Styled.Title>Nova refeição</Styled.Title>
+        <Styled.Title>{FORM_UI.TITLE}</Styled.Title>
         <Styled.Form>
           <Styled.FormWrap>
             <Styled.Label>Nome</Styled.Label>
             <Styled.Input
               keyboardType='default'
-              onChangeText={(value) => setFormText((oldValue) => ({ ...oldValue, name: value.trim() }))}
+              onChangeText={(value) => setFormText((oldValue) => ({ ...oldValue, name: value }))}
+              value={formText.name}
             />
           </Styled.FormWrap>
           <Styled.FormWrap>
@@ -122,7 +183,10 @@ export default function Form() {
               style={{
                 textAlignVertical: 'top'
               }}
-              onChangeText={(value) => setFormText((oldValue) => ({ ...oldValue, description: value.trim() }))}
+              onChangeText={
+                (value) => setFormText((oldValue) => ({ ...oldValue, description: value }))
+              }
+              value={formText.description}
             />
           </Styled.FormWrap>
           {plataform === 'android' && (
@@ -158,9 +222,9 @@ export default function Form() {
             </Styled.FormRow>
           </Styled.FormWrap>
           <Button
-            title='Cadastrar refeição'
+            title={FORM_UI.BUTTON_TITLE}
             style={{ width: '90%', marginTop: 50 }}
-            onPress={handleSubmit}
+            onPress={type === 'store' ? handleStore : handleUpdate}
           />
         </Styled.Form>
         <Styled.BackButtonTouchable onPress={() => navigation.navigate('Home')}>
@@ -213,7 +277,7 @@ function FormAndroid({ formDate, setFormDate }: FormProps) {
       >
         <Styled.Label>Data</Styled.Label>
         <Styled.Input
-          value={formatDate}
+          value={formDate.date || formatDate}
         />
         {showDatePicker && (
           <DatePicker
@@ -230,7 +294,7 @@ function FormAndroid({ formDate, setFormDate }: FormProps) {
       >
         <Styled.Label>Hora</Styled.Label>
         <Styled.Input
-          value={`${formatTime}`}
+          value={`${formDate.time || formatTime}`}
           editable={false}
         />
         {showTimePicker && (
